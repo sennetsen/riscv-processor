@@ -1,0 +1,58 @@
+# SETUP
+lui t0, 0x0172f
+addi t0, t0, 0x082
+sw t0, 0(x0)
+lui t0, 0x44200
+sw t0, 4(x0)
+addi t0, x0, 0x244
+sw t0, 8(x0)
+
+#   read a from memory location 0;
+#   the most significant byte of b is located at memory location 9,
+#   the next byte is at address 8,
+#   the next byte is at 7,
+#   and the least significant byte is at location 6;
+#   place the output of algorithm in t0
+
+# START OF GCD ALGORITHM
+
+# Loading the 4 bytes of B into different registers
+lb x1, 9(x0)
+lb x2, 8(x0)
+lb x3, 7(x0)
+lb x4, 6(x0)
+
+# Loading word A from memory into x6
+lw x6, 0(x0)
+
+# Storing B as a word into x1
+slli x1, x1, 24
+slli x2, x2, 16
+slli x3, x3, 8
+add x1, x1, x2
+add x1, x1, x3
+add x1, x1, x4
+
+loop:
+slt x7, x0, x6
+slt x8, x0, x1
+and x9, x7, x8
+beq x9, x0, end_loop
+
+# if statement - x10 holds temporary value
+bge x6, x1, no_if_swap
+add x10, x6, x0
+add x6, x1, x0
+add x1, x10, x0
+
+# temporary value C in x11
+no_if_swap:
+sub x11, x6, x1
+add x6, x1, x0
+add x1, x11, x0
+
+beq x0, x0, loop
+
+# store value A (GCD value) into x5
+end_loop:
+add x5, x6, x0

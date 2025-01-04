@@ -1,0 +1,326 @@
+## 32-Bit RISC-V test cases
+## The following test suite covers corner cases and general cases for
+## the operations that my processor performs. Edge cases, followed by general cases,
+## and then random cases with operations all mixed together are tested here.
+
+## ALL OPERATION CASES
+## desc = ADD edge cases
+## cycles = 1
+## start[1] = 2147483645
+## start[3] = 10
+## expect[1] = 0x80000007
+## expect[3] = 0x80000011
+add x1, x1, x3     # Max int add
+add x3, x3, x1     
+add x1, x1, x2     # add to itself
+
+## desc = ADD random cases
+## cycles = 1000
+## start[1] = 5
+## start[2] = 3
+## start[3] = 7
+## expect[1] = 8           
+## expect[2] = 10          
+## expect[3] = 15
+add x1, x1, x2
+add x2, x3, x2
+add x3, x1, x3
+
+## desc = SUB edge cases
+## cycles = 100
+## start[1] = 0xf0000000
+## start[2] = 2
+## start[3] = 0xffffffff
+## expect[1] = 0xf0000000
+## expect[2] = 0x0fffffff
+## expect[3] = 0xe0000001
+sub x4, x3, x3    # subtract -1 from itself
+sub x2, x3, x1    # subtract -1 from max int
+sub x3, x1, x2    # subtract regular int from max int
+
+## desc = SUB random cases
+## cycles = 1000
+## start[11] = 50
+## start[12] = 30
+## start[13] = 20
+## start[14] = 10
+## expect[11] = 20          
+## expect[12] = 10        
+## expect[13] = 0         
+## expect[14] = 20   
+## expect[31] = -10       
+sub x11, x11, x12   
+sub x12, x13, x14  
+sub x13, x14, x12   
+sub x14, x11, x13   
+sub x31, x12, x14
+
+## desc = AND edge cases
+## cycles = 100
+## start[1] = 0xf0000000
+## start[2] = 1
+## start[3] = 0xffffffff
+## expect[1] = 0xf0000000
+## expect[2] = 0
+## expect[3] = 0
+and x0, x0, x0    # and 0 with itself
+and x2, x0, x0    # and 0 with itself in new register
+and x3, x1, x2    # and max int and 1 in new register
+
+## desc = AND random cases
+## cycles = 100
+## start[1] = 5737
+## start[2] = 13278
+## start[3] = 3520
+## start[4] = 3567
+## start[5] = 892
+## expect[1] = 64
+## expect[2] = 72
+## expect[3] = 584
+## expect[4] = 72
+## expect[5] = 72
+and x1, x1, x2
+and x2, x3, x4
+and x3, x1, x5
+and x4, x4, x1
+and x5, x5, x4
+and x1, x2, x3
+and x2, x4, x5
+
+## desc = SLT edge cases
+## cycles = 100
+## start[1] = 0x00000000
+## start[2] = 0x00000001
+## start[3] = 0xffffffff
+## start[4] = 0x80000000
+## start[5] = 0x7fffffff
+## expect[1] = 1
+## expect[2] = 0
+## expect[3] = 0
+## expect[4] = 1
+## expect[5] = 0
+slt x1, x1, x2    # slt 0 and 1
+slt x2, x2, x3    # slt 1 and -1
+slt x3, x3, x3    # slt -1 and itself
+slt x4, x4, x5    # slt different large value and large value
+slt x5, x5, x1    # slt value and 0
+
+## desc = Random SLT Cases
+## cycles = 100
+## start[1] = 123456
+## start[2] = -987654
+## start[3] = 876543
+## start[4] = -98765
+## start[5] = 12345
+## expect[1] = 0
+## expect[2] = 1
+## expect[3] = 0
+## expect[4] = 0
+## expect[5] = 1
+slt x1, x1, x2
+slt x2, x2, x3
+slt x3, x3, x4
+slt x4, x4, x5
+slt x5, x5, x1
+
+## desc = SLL edge cases
+## cycles = 100
+## start[1] = 0x0fffffff
+## start[2] = 0x00000001
+## start[3] = 0xf0000000
+## start[4] = 0xffffffff
+## expect[1] = 0x1ffffffe
+## expect[2] = 0x00000001
+## expect[3] = 0
+## expect[4] = 0xfffffffe
+sll x1, x1, x2    # max int shift by 1
+sll x2, x2, x3    # 1 shift by min int
+sll x3, x3, x4    # min int shift by -1
+sll x4, x4, x2    # -1 shift by 1
+
+## desc = Random SLL cases
+## cycles = 100
+## start[1] = 5801
+## start[2] = 13349
+## start[3] = -3478
+## start[4] = 3602
+## start[5] = -899
+## expect[1] = 185632
+## expect[2] = 13669376
+## expect[3] = -911736832
+## expect[4] = 1073741824
+## expect[5] = -899
+sll x1, x1, x2
+sll x2, x2, x3
+sll x3, x3, x4
+sll x4, x4, x5
+sll x5, x5, x1
+
+## desc = SRA edge cases
+## cycles = 100
+## start[1] = 0x0fffffff
+## start[2] = 0x00000001
+## start[3] = 0xf0000000
+## start[4] = 0xffffffff
+## expect[1] = 0x07ffffff
+## expect[2] = 0x00000001
+## expect[3] = 0xffffffff
+## expect[4] = 0xffffffff
+sra x1, x1, x2    # max int shift by 1
+sra x2, x2, x3    # 1 shift by min int
+sra x3, x3, x4    # min int shift by -1
+sra x4, x4, x2    # -1 shift by 1
+
+## desc = Random SRA cases
+## cycles = 100
+## start[1] = 5801
+## start[2] = 13349
+## start[3] = -3478
+## start[4] = 3602
+## start[5] = -899
+## expect[1] = 181
+## expect[2] = 13
+## expect[3] = -1
+## expect[4] = 0
+## expect[5] = -1
+sra x1, x1, x2
+sra x2, x2, x3
+sra x3, x3, x4
+sra x4, x4, x5
+sra x5, x5, x1
+
+## desc = ADDI edge cases
+## cycles = 1000
+### start[1] = 242
+## start[2] = 42
+## start[3] = 13
+## start[4] = 242
+## start[5] = 134
+## start[6] = 142
+## start[9] = 5
+## start[10] = 9
+## expect[1] = 2047
+## expect[2] = 2048
+## expect[3] = -2048
+## expect[4] = 0
+## expect[5] = 1
+## expect[6] = -2
+## expect[9] = 2
+## expect[10] = -1
+addi x1, x0, 2047         # addi max pos to x1
+addi x2, x1, 1            # addi 1 to x1 (overflow)
+addi x3, x0, -2048        # addi min neg to x3
+addi x4, x0, 0            # addi 0 to x4
+addi x5, x0, 1            # addi min pos to x5
+addi x6, x0, -2           # addi max neg to x6
+addi x9, x4, 2            # addi overflow
+addi x10, x5, -2          # addi other end overflow
+
+## desc = ADDI random cases
+## cycles = 1000
+## start[1] = 5
+## start[2] = 9
+## start[3] = 3
+## start[4] = 8
+## start[5] = 77
+## expect[1] = 20
+## expect[2] = 24
+## expect[3] = 23
+## expect[4] = 108
+## expect[5] = 82
+addi x1, x1, 15
+addi x2, x2, 15
+addi x3, x3, 20
+addi x4, x4, 100
+addi x5, x5, 5
+
+## desc = ANDI edge cases
+## cycles = 100
+## start[1] = 0xf0000000
+## start[2] = 1
+## start[3] = 0xffffffff
+## expect[1] = 0xf0000000
+## expect[2] = 0
+## expect[3] = 0
+andi x0, x0, 1      # andi 0 and 1
+andi x2, x0, -1     # andi 0 and -1
+andi x3, x1, 0      # andi min neg int and 0
+
+## desc = Random ANDI Cases
+## cycles = 100
+## start[1] = 1023
+## start[2] = 511
+## start[3] = 255
+## start[4] = 127
+## start[5] = 63
+## expect[1] = 16
+## expect[2] = 48
+## expect[3] = 32
+## expect[4] = 0
+## expect[5] = 0
+andi x1, x1, 16
+andi x2, x4, 48
+andi x3, x2, 32
+andi x4, x1, 8
+andi x5, x3, 2
+
+## desc = LW/LB/SW/SB edge cases
+## cycles = 100
+## start[1] = 1
+## start[2] = 4
+## start[3] = 99
+## start[4] = 0
+## start[5] = 10
+## start[6] = 0
+## expect[1] = 0
+## expect[2] = 4
+## expect[3] = 99
+## expect[4] = 0
+## expect[5] = 10
+## expect[6] = 0
+sw x1, 2(x5)
+lw x1, 0(x2)
+sb x3, 4(x6)
+lb x3, 4(x4)
+
+## desc = LUI edge cases
+## cycles = 100
+## start[6] = 0
+## start[7] = 1
+## start[8] = -1
+## expect[6] = 0x7ffff000
+## expect[7] = 0x80000000
+## expect[8] = 0xfffff000
+lui x6, 524287    # lui max immediate value
+lui x7, -524288   # lui min immediate value
+lui x8, -1        # lui -1
+
+## desc = Random LUI cases
+## cycles = 100
+## start[6] = 123
+## start[7] = 456
+## start[8] = 789
+## start[9] = 101
+## start[10] = 202
+## expect[6] = 0x0009f000
+## expect[7] = 0x001c8000
+## expect[8] = 0x00268000
+## expect[9] = 0x00050000
+## expect[10] = 0x00081000
+lui x6, 159
+lui x7, 456
+lui x8, 616
+lui x9, 80
+lui x10, 129
+
+## desc = BEQ cases
+## cycles = 100
+## expect[1] = 94
+## expect[2] = 90
+
+addi x1, x0, 94
+beq x1, x1, exit    # equal to itself so branch is taken
+slt x1, x2, x4      
+
+exit:
+addi x2, x0, 90     # branch skips previous instruction and executes here
